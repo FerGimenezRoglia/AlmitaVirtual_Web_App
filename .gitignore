@@ -1,0 +1,35 @@
+# Archivos de compilación
+target/
+build/
+
+# IDEs
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+
+# Archivos generados
+*.log
+*.tmp
+*.bak
+*.swp
+
+# Archivos específicos
+HELP.md
+
+# Maven Wrapper
+.mvn/wrapper/maven-wrapper.jar
+!mvnw
+!mvnw.cmd
+!/.mvn/wrapper/maven-wrapper.properties
+
+# Archivos del sistema
+.DS_Store
+
+# No ignorar archivos importantes
+!src/
+!pom.xml
+!.gitignore
+!README.md
