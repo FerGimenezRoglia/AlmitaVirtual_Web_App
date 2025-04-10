@@ -41,11 +41,11 @@ public class EnvironmentServiceImpl implements EnvironmentService {
                     return new UserNotFoundException("User not found");
                 });
 
-        EnvironmentColor color = request.color() != null ? request.color() : EnvironmentColor.NEUTRO;
+        EnvironmentColor color = request.color() != null ? request.color() : EnvironmentColor.NEUTRAL;
 
         EnvironmentStatus status = (request.url() != null && !request.url().isBlank())
-                ? EnvironmentStatus.ACTIVA
-                : EnvironmentStatus.REPOSA;
+                ? EnvironmentStatus.ACTIVE
+                : EnvironmentStatus.IDLE;
 
         Environment environment = Environment.builder()
                 .title(request.title())

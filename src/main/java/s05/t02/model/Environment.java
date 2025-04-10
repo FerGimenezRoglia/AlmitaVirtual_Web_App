@@ -25,14 +25,14 @@ public class Environment {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private EnvironmentColor color = EnvironmentColor.NEUTRO;
+    private EnvironmentColor color = EnvironmentColor.NEUTRAL;
 
     @Column(length = 255)
     private String url;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private EnvironmentStatus status = EnvironmentStatus.REPOSA;
+    private EnvironmentStatus status = EnvironmentStatus.IDLE;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
