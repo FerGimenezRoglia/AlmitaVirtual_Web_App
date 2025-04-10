@@ -1,177 +1,195 @@
 #!/bin/zsh
 
+# Definición de colores ANSI
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+BLUE='\033[1;34m'
+CYAN='\033[1;36m'
+YELLOW='\033[1;33m'
+MAGENTA='\033[1;35m'
+NC='\033[0m' # No Color
+BOLD='\033[1m'
+
+clear
+
 echo ""
+echo "${YELLOW}==============="
 echo "ALMITA VIRTUAL"
-echo "======================"
+echo "===============$NC"
 echo ""
 
-cat << "EOF"
-Descripción General
--------------------
-"Almita Virtual" es una aplicación web donde cada usuario puede crear entornos personalizados y muy básicos que sirven como espacio digital para presentar o compartir su currículum, carta de presentación u otros documentos importantes.
+echo "${CYAN}${BOLD}Descripción General${NC}"
+echo "-------------------->"
+echo "\"Almita Virtual\" es una aplicación web donde cada usuario puede crear entornos personalizados que sirven como espacio digital para presentar o compartir su currículum, carta de presentación u otros documentos importantes."
+echo ""
+echo "Cada entorno está representado visualmente por una Almita, un personaje animado que cambia de estado según la interacción del usuario o visitante. La propuesta combina funcionalidad técnica con una experiencia estética cuidada y simbólica."
+echo ""
 
-Cada entorno está representado visualmente por una Almita, un personaje animado que cambia de estado según la interacción del usuario o visitante. La propuesta combina funcionalidad técnica con una experiencia estética cuidada y simbólica.
+echo "${CYAN}${BOLD}Usuario y CRUD${NC}"
+echo "--------------->"
+echo "- El usuario puede crear múltiples entornos (como tener varios Curriculums)."
+echo "- Cada entorno incluye:"
+echo "  - Título o profesión"
+echo "  - Descripción breve"
+echo "  - Color personalizado"
+echo "  - Archivo adjunto (PDF o JPG)"
+echo "  - Estado"
+echo "- CRUD completo sobre los entornos."
+echo "- Eliminando un entorno, se elimina también el archivo (Cloudinary)."
+echo ""
 
-Usuario y CRUD
---------------
-- El usuario puede crear múltiples entornos (como tener varios Curriculums).
-- Cada entorno incluye:
-  - Título o profesión
-  - Descripción breve
-  - Color personalizado
-  - Archivo adjunto (PDF o JPG)
-  - Estado
-- CRUD completo sobre los entornos.
-- Eliminando un entorno, se elimina también el archivo (Cloudinary).
+echo "${CYAN}${BOLD}Seguridad y Roles${NC}"
+echo "------------------>"
+echo "- Autenticación con JWT."
+echo "- Middleware de autorización."
+echo "- Roles:"
+echo "  - ROLE_USER: solo accede a sus entornos."
+echo "  - ROLE_ADMIN: accede a todos los entornos del sistema."
+echo ""
 
-Seguridad y Roles
------------------
-- Autenticación con JWT.
-- Middleware de autorización.
-- Roles:
-  - ROLE_USER: solo accede a sus entornos.
-  - ROLE_ADMIN: accede a todos los entornos del sistema.
+echo "${CYAN}${BOLD}Archivos${NC}"
+echo "--------->"
+echo "- Los usuarios pueden subir y borrar archivos asociados a cada entorno."
+echo "- Los visitantes pueden ver y descargar el archivo desde la vista pública del entorno."
+echo "- Los archivos se alojan en Cloudinary, solo se guarda el link en la base de datos."
+echo ""
 
-Archivos
---------
-- Los usuarios pueden subir y borrar archivos asociados a cada entorno.
-- Los visitantes pueden ver y descargar el archivo desde la vista pública del entorno.
-- Los archivos se alojan en Cloudinary, solo se guarda el link en la base de datos.
+echo "${CYAN}${BOLD}Estados de la Almita${NC}"
+echo "--------------------->"
+echo "- Reposo: sin actividad reciente."
+echo "- Activo: se sube un archivo."
+echo "- Entusiasmado: alguien descarga el archivo."
+echo "- Pensativo: se borra el archivo."
+echo "- Inspirado: el usuario pulsa el botón “me interesa”."
+echo "Cada estado tiene una animación o video corto representativo, visible en la interfaz."
+echo ""
 
-Estados de la Almita
---------------------
-- Reposo: sin actividad reciente.
-- Activo: se sube un archivo.
-- Entusiasmado: alguien descarga el archivo.
-- Pensativo: se borra el archivo.
-- Inspirado: el usuario pulsa el botón “me interesa”.
+echo "${CYAN}${BOLD}Diseño Estético${NC}"
+echo "---------------->"
+echo "- La pantalla muestra:"
+echo "  - A la izquierda arriba: la Almita animada."
+echo "  - Debajo del Almita: nombre de usuario y los datos del entorno (título, descripción)."
+echo "  - A la derecha arriba: una pantalla (dibujado)."
+echo "  - A la derecha abajo: un teclado (dibujado)."
+echo "  - Cada tecla es un botón de acción."
+echo "- Adaptable a dispositivos móviles."
+echo "- Estética sobria, con fondos neutros y detalles de color según la personalización."
+echo ""
 
-Cada estado tiene una animación o video corto representativo, visible en la interfaz.
-
-Diseño Estético
----------------
-- La pantalla muestra:
-  - A la izquierda arriba: la Almita animada.
-  - Debajo del Almita: nombre de usuario y los datos del entorno (título, descripción).
-  - A la derecha arriba: una pantalla (dibujado).
-  - A la derecha abajo: un teclado (dibujado).
-  - Cada tecla es un botón de acción.
-- Adaptable a dispositivos móviles.
-- Estética sobria, con fondos neutros y detalles de color según la personalización.
-
-
-==============================
-FLUJO DEL PROGRAMA
-==============================
-
-◆ Inicio de la app (User)
-
-Usuario no logueado
-       ↓
-→ Registro (si no tiene cuenta)
-→ Login (si ya tiene cuenta)
-       ↓
-Usuario autenticado
-       ↓
-Vista principal del usuario
-       ↓
-- Ver entornos existentes
-- Crear un entorno
-- Ver un entorno (entra al entorno)
-- Editar un entorno (solo dentro del entorno)
-- Eliminar un entorno
-       ↓
-Vista dentro del entorno
-- Se ve nombre de usuario
-- Se ve título y descripción del entorno (privado, editables por el user)
-- Cambia el estado del entorno automáticamente al editar:
-  - Subir archivo → estado = ACTIVA (privado)
-  - Borrar archivo → estado = PENSATIVA (privado)
-  - Descargar o ver archivo → estado = ENTUSIASMADA (público)
-  - “Me interesa” → estado = INSPIRADA (público)
-       ↓
-Cerrar sesión
-
-◆ Inicio de la app (User_Admin)
-
-Login
-       ↓
-Usuario autenticado
-       ↓
-Vista principal del usuario_Admin
-       ↓
-- Ver todos los entornos
-- Crear un entorno
-- Ver un entorno (entra al entorno)
-- Editar un entorno (solo dentro del entorno)
-- Eliminar un entorno
-       ↓
-Vista dentro del entorno
-- Se ve nombre de usuario
-- Se ve título y descripción del entorno (privado, editables por el user_admin)
-- Misma lógica de cambio de estado que User
-       ↓
-Cerrar sesión
-
-==============================
-ENDPOINTS NECESARIOS
-==============================
-
-AUTENTICACIÓN
-- POST /auth/register        → Registrar usuario
-- POST /auth/login           → Iniciar sesión (JWT)
-
-ENVIRONMENTS (PRIVADO)
-- GET /environments          → Obtener entornos del usuario
-- GET /environments/{id}     → Obtener un entorno por ID
-- POST /environments         → Crear un nuevo entorno
-- PUT /environments/{id}     → Editar título, descripción, color o estado
-- DELETE /environments/{id}  → Eliminar un entorno
-
-ARCHIVOS (PRIVADO)
-- POST /environments/{id}/upload     → Subir archivo
-- DELETE /environments/{id}/delete   → Borrar archivo
-
-ARCHIVOS (PÚBLICO)
-- GET /public/environments/{id}             → Ver entorno por ID
-- GET /public/environments/{id}/file        → Ver o descargar archivo
-- PATCH /public/environments/{id}/status    → Cambiar estado (“me interesa”)
-
-==============================
-LÓGICA DE NEGOCIO (TREE)
-==============================
-
-ALMITA VIRTUAL LOGIC TREE
-├── Usuario
-│   ├── Se registra con rol por defecto (ROLE_USER)
-│   ├── Puede iniciar sesión y recibe JWT
-│   └── Ve solo sus entornos
-│
-├── Entorno
-│   ├── Título obligatorio
-│   ├── Descripción opcional (máx. 500 chars)
-│   ├── Color elegido (o NEUTRO por defecto)
-│   ├── URL de archivo opcional
-│   ├── Estado (default: REPOSA)
-│   └── Relacionado a un único usuario
-│
-├── Acciones del entorno
-│   ├── Crear / Ver / Editar / Eliminar (privado)
-│   ├── Subir archivo → ACTIVA (privado)
-│   ├── Borrar archivo → PENSATIVA (privado)
-│   ├── Descargar o ver archivo → ENTUSIASMADA (público)
-│   ├── Botón “Me interesa” → INSPIRADA (público)
-│   └── Tiempo sin actividad → REPOSA (automático)
-│
-└── Seguridad
-    ├── Registro y login con JWT
-    ├── Middleware para proteger rutas privadas
-    ├── Solo el User dueño puede modificar su entorno
-    ├── User_Admin puede ver y eliminar cualquier entorno
-    └── Entornos públicos visibles sin login (solo lectura)
-
-EOF
+echo "${MAGENTA}${BOLD}FLUJO DEL PROGRAMA${NC}"
+echo "${MAGENTA}${BOLD}===================${NC}"
 
 echo ""
-echo "Fin del resumen de Almita Virtual"
+echo "▶︎ Inicio de la app (User)"
+echo ""
+echo "Usuario no logueado"
+echo "       ${BLUE}↓${NC}"
+echo "${YELLOW}➝${NC} Registro (si no tiene cuenta)"
+echo "${YELLOW}➝${NC} Login (si ya tiene cuenta)"
+echo "       ${BLUE}↓${NC}"
+echo "Usuario autenticado"
+echo "       ${BLUE}↓${NC}"
+echo "Vista principal del usuario"
+echo "       ${BLUE}↓${NC}"
+echo "- Ver entornos existentes"
+echo "- Crear un entorno"
+echo "- Ver un entorno (entra al entorno)"
+echo "- Editar un entorno (solo dentro del entorno)"
+echo "- Eliminar un entorno"
+echo "       ${BLUE}↓${NC}"
+echo "Vista dentro del entorno"
+echo "- Se ve nombre de usuario"
+echo "- Se ve título y descripción del entorno (privado, editables por el user)"
+echo "- Cambia el estado del entorno automáticamente:"
+echo "  - Subir archivo ${GREEN}         → estado = ACTIVA${NC}"
+echo "  - Borrar archivo ${RED}        → estado = PENSATIVA${NC}"
+echo "  - Descargar/ver archivo ${BLUE} → estado = ENTUSIASMADA${NC}"
+echo "  - Me interesa ${MAGENTA}           → estado = INSPIRADA${NC}"
+echo "       ${BLUE}↓${NC}"
+echo "Cerrar sesión"
+echo ""
+
+echo "▶︎ Inicio de la app (User_Admin)"
+echo ""
+echo "Login"
+echo "       ${BLUE}↓${NC}"
+echo "Usuario autenticado"
+echo "       ${BLUE}↓${NC}"
+echo "Vista principal del usuario_Admin"
+echo "       ${BLUE}↓${NC}"
+echo "- Ver todos los entornos"
+echo "- Crear un entorno"
+echo "- Ver un entorno"
+echo "- Editar un entorno"
+echo "- Eliminar un entorno"
+echo "       ${BLUE}↓${NC}"
+echo "Vista dentro del entorno (misma lógica que User)"
+echo "       ${BLUE}↓${NC}"
+echo "Cerrar sesión"
+echo ""
+
+echo "${MAGENTA}${BOLD}ENDPOINTS NECESARIOS${NC}"
+echo "${MAGENTA}${BOLD}=====================${NC}"
+
+echo ""
+echo "${BOLD}AUTENTICACIÓN${NC}"
+echo -e "${GREEN}POST${NC} /auth/register        → Registrar usuario"
+echo -e "${GREEN}POST${NC} /auth/login           → Iniciar sesión (JWT)"
+echo ""
+
+echo "${BOLD}ENVIRONMENTS (PRIVADO)${NC}"
+echo -e "${BLUE}GET${NC} /environments           → Obtener entornos del usuario"
+echo -e "${BLUE}GET${NC} /environments/{id}      → Obtener un entorno por ID"
+echo -e "${GREEN}POST${NC} /environments          → Crear un nuevo entorno"
+echo -e "${YELLOW}PUT${NC} /environments/{id}      → Editar título, descripción, color o estado"
+echo -e "${RED}DELETE${NC} /environments/{id}   → Eliminar un entorno"
+echo ""
+
+echo "${BOLD}ARCHIVOS (PRIVADO)${NC}"
+echo -e "${GREEN}POST${NC} /environments/{id}/upload     → Subir archivo"
+echo -e "${RED}DELETE${NC} /environments/{id}/delete   → Borrar archivo"
+echo ""
+
+echo "${BOLD}ARCHIVOS (PÚBLICO)${NC}"
+echo -e "${BLUE}GET${NC} /public/environments/{id}             → Ver entorno"
+echo -e "${BLUE}GET${NC} /public/environments/{id}/file        → Ver o descargar archivo"
+echo -e "${MAGENTA}PATCH${NC} /public/environments/{id}/status    → Cambiar estado (“me interesa”)"
+echo ""
+
+echo "LÓGICA DE NEGOCIO (TREE)"
+echo "==========================="
+
+echo ""
+echo "${CYAN}ALMITA VIRTUAL LOGIC${NC}"
+echo -e "${YELLOW}│${NC}"
+echo -e "${YELLOW}├──${NC} Usuario"
+echo -e "│   ├── Se registra con rol por defecto (ROLE_USER)"
+echo -e "│   ├── Puede iniciar sesión y recibe JWT"
+echo -e "│   └── Ve solo sus entornos"
+echo -e "${YELLOW}│${NC}"
+echo -e "${YELLOW}├──${NC} Entorno"
+echo -e "│   ├── Título obligatorio"
+echo -e "│   ├── Descripción opcional (máx. 500 chars)"
+echo -e "│   ├── Color elegido (o NEUTRO por defecto)"
+echo -e "│   ├── URL de archivo opcional"
+echo -e "│   ├── Estado (default: REPOSA)"
+echo -e "│   └── Relacionado a un único usuario"
+echo -e "${YELLOW}│${NC}"
+echo -e "${YELLOW}├──${NC} Acciones del entorno"
+echo -e "│   ├── Crear / Ver / Editar / Eliminar (privado)"
+echo -e "│   ├── Subir archivo → ACTIVA"
+echo -e "│   ├── Borrar archivo → PENSATIVA"
+echo -e "│   ├── Descargar o ver archivo → ENTUSIASMADA"
+echo -e "│   ├── Botón “Me interesa” → INSPIRADA"
+echo -e "│   └── Tiempo sin actividad → REPOSA"
+echo -e "${YELLOW}│${NC}"
+echo -e "${YELLOW}└──${NC} Seguridad"
+echo -e "    ├── Registro y login con JWT"
+echo -e "    ├── Middleware para rutas privadas"
+echo -e "    ├── Solo el User puede modificar su entorno"
+echo -e "    ├── Admin puede ver y eliminar todos"
+echo -e "    └── Entornos públicos visibles sin login"
+
+echo ""
+echo "${YELLOW}${BOLD}Fin del resumen de Almita Virtual${NC}"
 echo ""
