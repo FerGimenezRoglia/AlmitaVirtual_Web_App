@@ -4,6 +4,7 @@ import s05.t02.model.dto.EnvironmentDTO;
 
 public interface PublicEnvironmentInteractionService {
 
-
-    EnvironmentDTO markAsInspired(Long environmentId);
+    EnvironmentDTO getPublicEnvironmentById(Long environmentId);
+    String getFileUrl(Long environmentId);
+    EnvironmentDTO markAsInterested(Long environmentId);
 }
