@@ -1,0 +1,177 @@
+#!/bin/zsh
+
+echo ""
+echo "ALMITA VIRTUAL"
+echo "======================"
+echo ""
+
+cat << "EOF"
+Descripción General
+-------------------
+"Almita Virtual" es una aplicación web donde cada usuario puede crear entornos personalizados y muy básicos que sirven como espacio digital para presentar o compartir su currículum, carta de presentación u otros documentos importantes.
+
+Cada entorno está representado visualmente por una Almita, un personaje animado que cambia de estado según la interacción del usuario o visitante. La propuesta combina funcionalidad técnica con una experiencia estética cuidada y simbólica.
+
+Usuario y CRUD
+--------------
+- El usuario puede crear múltiples entornos (como tener varios Curriculums).
+- Cada entorno incluye:
+  - Título o profesión
+  - Descripción breve
+  - Color personalizado
+  - Archivo adjunto (PDF o JPG)
+  - Estado
+- CRUD completo sobre los entornos.
+- Eliminando un entorno, se elimina también el archivo (Cloudinary).
+
+Seguridad y Roles
+-----------------
+- Autenticación con JWT.
+- Middleware de autorización.
+- Roles:
+  - ROLE_USER: solo accede a sus entornos.
+  - ROLE_ADMIN: accede a todos los entornos del sistema.
+
+Archivos
+--------
+- Los usuarios pueden subir y borrar archivos asociados a cada entorno.
+- Los visitantes pueden ver y descargar el archivo desde la vista pública del entorno.
+- Los archivos se alojan en Cloudinary, solo se guarda el link en la base de datos.
+
+Estados de la Almita
+--------------------
+- Reposo: sin actividad reciente.
+- Activo: se sube un archivo.
+- Entusiasmado: alguien descarga el archivo.
+- Pensativo: se borra el archivo.
+- Inspirado: el usuario pulsa el botón “me interesa”.
+
+Cada estado tiene una animación o video corto representativo, visible en la interfaz.
+
+Diseño Estético
+---------------
+- La pantalla muestra:
+  - A la izquierda arriba: la Almita animada.
+  - Debajo del Almita: nombre de usuario y los datos del entorno (título, descripción).
+  - A la derecha arriba: una pantalla (dibujado).
+  - A la derecha abajo: un teclado (dibujado).
+  - Cada tecla es un botón de acción.
+- Adaptable a dispositivos móviles.
+- Estética sobria, con fondos neutros y detalles de color según la personalización.
+
+
+==============================
+FLUJO DEL PROGRAMA
+==============================
+
+◆ Inicio de la app (User)
+
+Usuario no logueado
+       ↓
+→ Registro (si no tiene cuenta)
+→ Login (si ya tiene cuenta)
+       ↓
+Usuario autenticado
+       ↓
+Vista principal del usuario
+       ↓
+- Ver entornos existentes
+- Crear un entorno
+- Ver un entorno (entra al entorno)
+- Editar un entorno (solo dentro del entorno)
+- Eliminar un entorno
+       ↓
+Vista dentro del entorno
+- Se ve nombre de usuario
+- Se ve título y descripción del entorno (privado, editables por el user)
+- Cambia el estado del entorno automáticamente al editar:
+  - Subir archivo → estado = ACTIVA (privado)
+  - Borrar archivo → estado = PENSATIVA (privado)
+  - Descargar o ver archivo → estado = ENTUSIASMADA (público)
+  - “Me interesa” → estado = INSPIRADA (público)
+       ↓
+Cerrar sesión
+
+◆ Inicio de la app (User_Admin)
+
+Login
+       ↓
+Usuario autenticado
+       ↓
+Vista principal del usuario_Admin
+       ↓
+- Ver todos los entornos
+- Crear un entorno
+- Ver un entorno (entra al entorno)
+- Editar un entorno (solo dentro del entorno)
+- Eliminar un entorno
+       ↓
+Vista dentro del entorno
+- Se ve nombre de usuario
+- Se ve título y descripción del entorno (privado, editables por el user_admin)
+- Misma lógica de cambio de estado que User
+       ↓
+Cerrar sesión
+
+==============================
+ENDPOINTS NECESARIOS
+==============================
+
+AUTENTICACIÓN
+- POST /auth/register        → Registrar usuario
+- POST /auth/login           → Iniciar sesión (JWT)
+
+ENVIRONMENTS (PRIVADO)
+- GET /environments          → Obtener entornos del usuario
+- GET /environments/{id}     → Obtener un entorno por ID
+- POST /environments         → Crear un nuevo entorno
+- PUT /environments/{id}     → Editar título, descripción, color o estado
+- DELETE /environments/{id}  → Eliminar un entorno
+
+ARCHIVOS (PRIVADO)
+- POST /environments/{id}/upload     → Subir archivo
+- DELETE /environments/{id}/delete   → Borrar archivo
+
+ARCHIVOS (PÚBLICO)
+- GET /public/environments/{id}             → Ver entorno por ID
+- GET /public/environments/{id}/file        → Ver o descargar archivo
+- PATCH /public/environments/{id}/status    → Cambiar estado (“me interesa”)
+
+==============================
+LÓGICA DE NEGOCIO (TREE)
+==============================
+
+ALMITA VIRTUAL LOGIC TREE
+├── Usuario
+│   ├── Se registra con rol por defecto (ROLE_USER)
+│   ├── Puede iniciar sesión y recibe JWT
+│   └── Ve solo sus entornos
+│
+├── Entorno
+│   ├── Título obligatorio
+│   ├── Descripción opcional (máx. 500 chars)
+│   ├── Color elegido (o NEUTRO por defecto)
+│   ├── URL de archivo opcional
+│   ├── Estado (default: REPOSA)
+│   └── Relacionado a un único usuario
+│
+├── Acciones del entorno
+│   ├── Crear / Ver / Editar / Eliminar (privado)
+│   ├── Subir archivo → ACTIVA (privado)
+│   ├── Borrar archivo → PENSATIVA (privado)
+│   ├── Descargar o ver archivo → ENTUSIASMADA (público)
+│   ├── Botón “Me interesa” → INSPIRADA (público)
+│   └── Tiempo sin actividad → REPOSA (automático)
+│
+└── Seguridad
+    ├── Registro y login con JWT
+    ├── Middleware para proteger rutas privadas
+    ├── Solo el User dueño puede modificar su entorno
+    ├── User_Admin puede ver y eliminar cualquier entorno
+    └── Entornos públicos visibles sin login (solo lectura)
+
+EOF
+
+echo ""
+echo "Fin del resumen de Almita Virtual"
+echo ""
