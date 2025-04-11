@@ -28,6 +28,7 @@ public class AuthController {
             summary = "Register a new user",
             description = "Creates a new user account with a username and password.")
     @ApiResponse(responseCode = "200", description = "User registered successfully")
+    @ApiResponse(responseCode = "400", description = "Invalid input or username already exists")
     public ResponseEntity<String> register(@Valid @RequestBody UserRegisterRequest request) {
         userService.registerUser(request.username(), request.password());
         return ResponseEntity.ok("User registered successfully");
@@ -38,6 +39,8 @@ public class AuthController {
             summary = "User login",
             description = "Authenticates a user and returns a JWT token upon success.")
     @ApiResponse(responseCode = "200", description = "Login successful, token returned")
+    @ApiResponse(responseCode = "400", description = "Invalid username or password")
+    @ApiResponse(responseCode = "401", description = "Unauthorized – JWT token invalid or missing")
     public ResponseEntity<?> login(@Valid @RequestBody UserLoginRequest loginRequest) {
         String token = userService.authenticateUser(loginRequest.username(), loginRequest.password());
         return ResponseEntity.ok(Collections.singletonMap("token", token));
