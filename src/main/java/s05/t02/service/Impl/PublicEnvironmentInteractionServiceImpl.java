@@ -39,7 +39,6 @@ public class PublicEnvironmentInteractionServiceImpl implements PublicEnvironmen
                 environment.getStatus(),
                 environment.getUser().getId()
         );
-
     }
 
     @Override
