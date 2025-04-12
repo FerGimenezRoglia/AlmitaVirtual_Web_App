@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import s05.t02.model.Environment;
 import s05.t02.model.dto.EnvironmentCreateRequest;
@@ -31,7 +32,8 @@ public class EnvironmentController {
     @ApiResponse(responseCode = "200", description = "List of environments retrieved successfully")
     @ApiResponse(responseCode = "401", description = "Unauthorized – JWT token is missing or invalid")
     @ApiResponse(responseCode = "404", description = "User not found")
-    public ResponseEntity<List<EnvironmentDTO>> getUserEnvironments(@RequestAttribute("username") String username) {
+    public ResponseEntity<List<EnvironmentDTO>> getUserEnvironments(Authentication authentication) {
+        String username = authentication.getName();
 
         List<EnvironmentDTO> environments = environmentService.getUserEnvironments(username).stream()
                 .map(env -> new EnvironmentDTO(
@@ -43,6 +45,7 @@ public class EnvironmentController {
                         env.getStatus(),
                         env.getUser().getId()
                 )).toList();
+
         return ResponseEntity.ok(environments);
     }
 
@@ -54,7 +57,8 @@ public class EnvironmentController {
     @ApiResponse(responseCode = "401", description = "Unauthorized – JWT token is missing or invalid")
     @ApiResponse(responseCode = "403", description = "Forbidden – User does not have access to this environment")
     @ApiResponse(responseCode = "404", description = "Environment or user not found")
-    public ResponseEntity<EnvironmentDTO> getEnvironmentById(@PathVariable Long id, @RequestAttribute("username") String username) {
+    public ResponseEntity<EnvironmentDTO> getEnvironmentById(@PathVariable Long id, Authentication authentication) {
+        String username = authentication.getName();
 
         Environment environment = environmentService.getEnvironmentById(id, username);
         EnvironmentDTO dto = new EnvironmentDTO(
@@ -77,10 +81,8 @@ public class EnvironmentController {
     @ApiResponse(responseCode = "400", description = "Bad Request – Invalid input data")
     @ApiResponse(responseCode = "401", description = "Unauthorized – JWT token is missing or invalid")
     @ApiResponse(responseCode = "404", description = "User not found")
-    public ResponseEntity<EnvironmentDTO> createEnvironment(
-            @Valid @RequestBody EnvironmentCreateRequest request,
-            @RequestAttribute("username") String username) {
-
+    public ResponseEntity<EnvironmentDTO> createEnvironment(@Valid @RequestBody EnvironmentCreateRequest request, Authentication authentication) {
+        String username = authentication.getName();
         EnvironmentDTO created = environmentService.createEnvironment(request, username);
         return ResponseEntity.status(201).body(created);
     }
@@ -95,10 +97,8 @@ public class EnvironmentController {
     @ApiResponse(responseCode = "401", description = "Unauthorized – JWT token is missing or invalid")
     @ApiResponse(responseCode = "403", description = "Forbidden – User does not have permission to update this environment")
     @ApiResponse(responseCode = "404", description = "Environment or user not found")
-    public ResponseEntity<EnvironmentDTO> updateEnvironment(
-            @PathVariable Long id,
-            @Valid @RequestBody EnvironmentUpdateRequest request,
-            @RequestAttribute("username") String username) {
+    public ResponseEntity<EnvironmentDTO> updateEnvironment(@PathVariable Long id, @Valid @RequestBody EnvironmentUpdateRequest request, Authentication authentication) {
+        String username = authentication.getName();
 
         Environment updated = environmentService.updateEnvironment(id, request, username);
         EnvironmentDTO dto = new EnvironmentDTO(
@@ -122,10 +122,8 @@ public class EnvironmentController {
     @ApiResponse(responseCode = "401", description = "Unauthorized – JWT token is missing or invalid")
     @ApiResponse(responseCode = "403", description = "Forbidden – User does not have permission to delete this environment")
     @ApiResponse(responseCode = "404", description = "Environment or user not found")
-    public ResponseEntity<Void> deleteEnvironment(
-            @PathVariable Long id,
-            @RequestAttribute("username") String username) {
-
+    public ResponseEntity<Void> deleteEnvironment(@PathVariable Long id, Authentication authentication) {
+        String username = authentication.getName();
         environmentService.deleteEnvironment(id, username);
         return ResponseEntity.noContent().build();
     }

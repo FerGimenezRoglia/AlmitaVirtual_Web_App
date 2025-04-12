@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import s05.t02.model.dto.EnvironmentDTO;
 import s05.t02.service.EnvironmentFileService;
@@ -28,11 +29,8 @@ public class EnvironmentFileController {
     @ApiResponse(responseCode = "401", description = "Unauthorized – JWT token is missing or invalid")
     @ApiResponse(responseCode = "403", description = "Forbidden – User not authorized to upload file")
     @ApiResponse(responseCode = "404", description = "Environment or user not found")
-    public ResponseEntity<EnvironmentDTO> uploadFile(
-            @PathVariable Long id,
-            @RequestParam("fileUrl") @NotBlank String fileUrl,
-            @RequestAttribute("username") String username) {
-
+    public ResponseEntity<EnvironmentDTO> uploadFile(@PathVariable Long id, @RequestParam("fileUrl") @NotBlank String fileUrl, Authentication authentication) {
+        String username = authentication.getName();
         EnvironmentDTO updated = environmentFileService.uploadFile(id, fileUrl, username);
         return ResponseEntity.ok(updated);
     }
@@ -45,10 +43,8 @@ public class EnvironmentFileController {
     @ApiResponse(responseCode = "401", description = "Unauthorized – JWT token is missing or invalid")
     @ApiResponse(responseCode = "403", description = "Forbidden – User not authorized to delete file")
     @ApiResponse(responseCode = "404", description = "Environment or user not found, or file is not present")
-    public ResponseEntity<EnvironmentDTO> deleteFile(
-            @PathVariable Long id,
-            @RequestAttribute("username") String username) {
-
+    public ResponseEntity<EnvironmentDTO> deleteFile(@PathVariable Long id, Authentication authentication) {
+        String username = authentication.getName();
         EnvironmentDTO updated = environmentFileService.deleteFile(id, username);
         return ResponseEntity.ok(updated);
     }

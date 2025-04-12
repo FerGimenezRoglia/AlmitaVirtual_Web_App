@@ -22,7 +22,6 @@ public class JwtFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
 
-    // Constructor para inyectar las dependencias necesarias
     public JwtFilter(JwtUtil jwtUtil, UserDetailsService userDetailsService) {
         this.jwtUtil = jwtUtil;
         this.userDetailsService = userDetailsService;
@@ -33,7 +32,6 @@ public class JwtFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain chain)
             throws ServletException, IOException {
-
         // Extraemos el header de Authorization
         String authHeader = request.getHeader("Authorization");
 
@@ -48,7 +46,6 @@ public class JwtFilter extends OncePerRequestFilter {
 
         // Extraemos el username desde el token
         String username = jwtUtil.extractUsername(token);
-        log.info("Extracted username '{}' from JWT token", username);
 
         // Verificamos que no haya una autenticación previa
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -68,7 +65,6 @@ public class JwtFilter extends OncePerRequestFilter {
 
                 // Establecemos la autenticación en el contexto de seguridad
                 SecurityContextHolder.getContext().setAuthentication(authToken);
-                log.info("JWT validated and authentication set for user '{}'", username);
             } else {
                 log.warn("Invalid JWT token for user '{}'", username);
             }
