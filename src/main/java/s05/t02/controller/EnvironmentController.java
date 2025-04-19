@@ -11,6 +11,7 @@ import s05.t02.model.Environment;
 import s05.t02.model.dto.EnvironmentCreateRequest;
 import s05.t02.model.dto.EnvironmentDTO;
 import s05.t02.model.dto.EnvironmentUpdateRequest;
+import s05.t02.repository.EnvironmentRepository;
 import s05.t02.service.EnvironmentService;
 
 import java.util.List;
@@ -20,22 +21,35 @@ import java.util.List;
 @Tag(name = "Environments", description = "Private endpoints for managing user environments")
 public class EnvironmentController {
     private final EnvironmentService environmentService;
+    private final EnvironmentRepository environmentRepository;
 
-    public EnvironmentController(EnvironmentService environmentService) {
+    public EnvironmentController(EnvironmentService environmentService, EnvironmentRepository environmentRepository) {
         this.environmentService = environmentService;
+        this.environmentRepository = environmentRepository;
     }
 
     @GetMapping
     @Operation(
             summary = "Get all environments",
-            description = "Returns all environments of the authenticated user")
+            description = "Returns all environments of the authenticated user, or all environments if admin"
+    )
     @ApiResponse(responseCode = "200", description = "List of environments retrieved successfully")
     @ApiResponse(responseCode = "401", description = "Unauthorized – JWT token is missing or invalid")
     @ApiResponse(responseCode = "404", description = "User not found")
     public ResponseEntity<List<EnvironmentDTO>> getUserEnvironments(Authentication authentication) {
         String username = authentication.getName();
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
 
-        List<EnvironmentDTO> environments = environmentService.getUserEnvironments(username).stream()
+        List<Environment> environments;
+
+        if (isAdmin) {
+            environments = environmentRepository.findAll(); // 🔥 Trae TODOS los entornos del sistema
+        } else {
+            environments = environmentService.getUserEnvironments(username); // 🔒 Solo los del user
+        }
+
+        List<EnvironmentDTO> dtoList = environments.stream()
                 .map(env -> new EnvironmentDTO(
                         env.getId(),
                         env.getTitle(),
@@ -44,9 +58,10 @@ public class EnvironmentController {
                         env.getUrl(),
                         env.getStatus(),
                         env.getUser().getId()
-                )).toList();
+                ))
+                .toList();
 
-        return ResponseEntity.ok(environments);
+        return ResponseEntity.ok(dtoList);
     }
 
     @GetMapping("/{id}")
