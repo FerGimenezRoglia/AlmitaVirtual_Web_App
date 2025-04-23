@@ -57,7 +57,7 @@ public class EnvironmentServiceImpl implements EnvironmentService {
                 .build();
 
         Environment saved = environmentRepository.save(environment);
-        log.info("Environment '{}' created successfully with ID {}", saved.getTitle(), saved.getId());
+        log.info("Environment '{}' created successfully with ID {} for user '{}'", saved.getTitle(), saved.getId(), username);
 
         return new EnvironmentDTO(
                 saved.getId(),
@@ -68,6 +68,20 @@ public class EnvironmentServiceImpl implements EnvironmentService {
                 saved.getStatus(),
                 saved.getUser().getId()
         );
+    }
+
+    @Override
+    public List<Environment> getEnvironments() {
+        log.info("Fetching environments");
+
+        List<Environment> environments = environmentRepository.findAll();
+
+        if (environments.isEmpty()) {
+            log.info("No environments found");
+        } else {
+            log.info("Found {} environments", environments.size());
+        }
+        return environments;
     }
 
     @Override

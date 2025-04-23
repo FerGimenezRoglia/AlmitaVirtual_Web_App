@@ -8,5 +8,4 @@ import java.util.List;
 public interface EnvironmentRepository extends JpaRepository<Environment, Long> {
 
     List<Environment> findByUserId(Long userId);
-
 }

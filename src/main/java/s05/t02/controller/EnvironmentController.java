@@ -11,7 +11,6 @@ import s05.t02.model.Environment;
 import s05.t02.model.dto.EnvironmentCreateRequest;
 import s05.t02.model.dto.EnvironmentDTO;
 import s05.t02.model.dto.EnvironmentUpdateRequest;
-import s05.t02.repository.EnvironmentRepository;
 import s05.t02.service.EnvironmentService;
 
 import java.util.List;
@@ -21,11 +20,9 @@ import java.util.List;
 @Tag(name = "Environments", description = "Private endpoints for managing user environments")
 public class EnvironmentController {
     private final EnvironmentService environmentService;
-    private final EnvironmentRepository environmentRepository;
 
-    public EnvironmentController(EnvironmentService environmentService, EnvironmentRepository environmentRepository) {
+    public EnvironmentController(EnvironmentService environmentService) {
         this.environmentService = environmentService;
-        this.environmentRepository = environmentRepository;
     }
 
     @GetMapping
@@ -44,7 +41,7 @@ public class EnvironmentController {
         List<Environment> environments;
 
         if (isAdmin) {
-            environments = environmentRepository.findAll();
+            environments = environmentService.getEnvironments();
         } else {
             environments = environmentService.getUserEnvironments(username);
         }
