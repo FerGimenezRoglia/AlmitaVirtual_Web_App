@@ -44,9 +44,9 @@ public class EnvironmentController {
         List<Environment> environments;
 
         if (isAdmin) {
-            environments = environmentRepository.findAll(); // 🔥 Trae TODOS los entornos del sistema
+            environments = environmentRepository.findAll();
         } else {
-            environments = environmentService.getUserEnvironments(username); // 🔒 Solo los del user
+            environments = environmentService.getUserEnvironments(username);
         }
 
         List<EnvironmentDTO> dtoList = environments.stream()
