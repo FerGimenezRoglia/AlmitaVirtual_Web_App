@@ -7,3 +7,4 @@ public enum EnvironmentColor {
     YELLOW,
     NEUTRAL
 }
+
