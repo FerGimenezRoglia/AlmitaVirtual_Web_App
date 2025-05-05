@@ -120,3 +120,12 @@ http://localhost:8080/swagger-ui.html
 - El backend es 100% stateless, usando JWT para mantener sesiones seguras.
 
 ---
+
+### 🛠️ Utilidad técnica
+
+Este proyecto incluye un script ejecutable que imprime una descripción detallada del backend, incluyendo el flujo del sistema, los estados de la Almita y los endpoints principales.
+
+Para ejecutarlo, abrí una terminal desde la raíz del proyecto y corré:
+
+```bash
+./describe-app.sh
