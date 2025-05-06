@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import s05.t02.exception.custom.EnvironmentNotFoundException;
 import s05.t02.model.Environment;
 import s05.t02.model.dto.EnvironmentDTO;
+import s05.t02.model.dto.PublicEnvironmentDTO;
 import s05.t02.model.enums.InteractionType;
 import s05.t02.repository.EnvironmentRepository;
 import s05.t02.service.PublicEnvironmentInteractionService;
@@ -21,7 +22,7 @@ public class PublicEnvironmentInteractionServiceImpl implements PublicEnvironmen
     }
 
     @Override
-    public EnvironmentDTO getPublicEnvironmentById(Long environmentId) {
+    public PublicEnvironmentDTO getPublicEnvironmentById(Long environmentId) {
         log.info("Public request to fetch environment with ID {}", environmentId);
 
         Environment environment = environmentRepository.findById(environmentId)
@@ -30,14 +31,14 @@ public class PublicEnvironmentInteractionServiceImpl implements PublicEnvironmen
                     return new EnvironmentNotFoundException("Environment not found");
                 });
 
-        return new EnvironmentDTO(
+        return new PublicEnvironmentDTO(
                 environment.getId(),
                 environment.getTitle(),
                 environment.getDescription(),
                 environment.getColor(),
                 environment.getUrl(),
                 environment.getStatus(),
-                environment.getUser().getId()
+                environment.getUser().getUsername()
         );
     }
 

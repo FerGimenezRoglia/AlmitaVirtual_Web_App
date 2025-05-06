@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import s05.t02.model.dto.EnvironmentDTO;
+import s05.t02.model.dto.PublicEnvironmentDTO;
 import s05.t02.service.PublicEnvironmentInteractionService;
 
 @RestController
@@ -25,8 +26,8 @@ public class PublicEnvironmentInteractionController {
             description = "Returns the environment with the specified ID. No authentication required.")
     @ApiResponse(responseCode = "200", description = "Environment retrieved successfully")
     @ApiResponse(responseCode = "404", description = "Environment not found")
-    public ResponseEntity<EnvironmentDTO> getPublicEnvironment(@PathVariable Long id) {
-        EnvironmentDTO dto = publicService.getPublicEnvironmentById(id);
+    public ResponseEntity<PublicEnvironmentDTO> getPublicEnvironment(@PathVariable Long id) {
+        PublicEnvironmentDTO dto = publicService.getPublicEnvironmentById(id);
         return ResponseEntity.ok(dto);
     }
 
