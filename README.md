@@ -1,7 +1,7 @@
 
 # Almita Virtual – Backend API
 
-![](https://github.com/FerGimenezRoglia/AlmitaVirtual_Web_App/blob/main/readme-assets/frontend-preview-1.jpg)
+![](https://github.com/FerGimenezRoglia/AlmitaVirtual_Web_App/blob/main/readme-assets/frontend-preview-2.jpg)
 
 Este repositorio contiene el backend del proyecto **Almita Virtual**, una aplicación web donde cada usuario puede crear entornos personalizados para presentar o compartir sus documentos importantes (como su CV o carta de presentación).
 
