@@ -16,6 +16,14 @@ public record UserRegisterRequest(
                 regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]+$",
                 message = "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
         )
-        String password
+        String password,
+
+        @NotBlank(message = "Recovery key is required")
+        @Size(min = 8, max = 100, message = "Recovery key must be at least 8 characters long")
+        @Pattern(
+                regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]+$",
+                message = "Recovery key must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
+        )
+        String recoveryKey
 
 ) {}

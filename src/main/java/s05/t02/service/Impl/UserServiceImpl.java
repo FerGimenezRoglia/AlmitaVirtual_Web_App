@@ -31,7 +31,7 @@ public class UserServiceImpl implements UserService {
      * Valida si el username ya existe, encripta la contraseña y guarda el usuario.
      */
     @Override
-    public UserDTO registerUser(String username, String password) {
+    public UserDTO registerUser(String username, String password, String recoveryKey) {
         log.info("Registering user: {}", username);
 
         if (userRepository.existsByUsername(username)) {
@@ -40,7 +40,9 @@ public class UserServiceImpl implements UserService {
         }
 
         String hashedPassword = passwordEncoder.encode(password);
-        User user = new User(username, hashedPassword, UserRole.ROLE_USER);
+        String hashedRecoveryKey = passwordEncoder.encode(recoveryKey);
+
+        User user = new User(username, hashedPassword, hashedRecoveryKey, UserRole.ROLE_USER);
         user = userRepository.save(user);
 
         log.info("User '{}' registered successfully", username);
@@ -67,4 +69,29 @@ public class UserServiceImpl implements UserService {
         log.info("User '{}' authenticated successfully", username);
         return jwtUtil.generateToken(user.getUsername(), user.getRole().name());
     }
+
+    /**
+     * Recupera la contraseña de un usuario validando la clave secreta.
+     * Si es válida, actualiza la contraseña por una nueva.
+     */
+    @Override
+    public void recoverPassword(String username, String recoveryKey, String newPassword) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> {
+                    log.warn("User '{}' not found during recovery attempt", username);
+                    return new InvalidCredentialsException("Invalid username or recovery key");
+                });
+
+        if (!passwordEncoder.matches(recoveryKey, user.getRecoveryKey())) {
+            log.warn("Recovery key mismatch for user '{}'", username);
+            throw new InvalidCredentialsException("Invalid username or recovery key");
+        }
+
+        String hashedNewPassword = passwordEncoder.encode(newPassword);
+        user.setPassword(hashedNewPassword);
+        userRepository.save(user);
+
+        log.info("Password updated successfully for user '{}'", username);
+    }
+
 }

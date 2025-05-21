@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import s05.t02.model.dto.PasswordRecoveryRequest;
 import s05.t02.model.dto.UserLoginRequest;
 import s05.t02.model.dto.UserRegisterRequest;
 import s05.t02.service.UserService;
@@ -26,11 +27,15 @@ public class AuthController {
     @PostMapping("/register")
     @Operation(
             summary = "Register a new user",
-            description = "Creates a new user account with a username and password.")
+            description = "Creates a new user account with a username, password and recovery key.")
     @ApiResponse(responseCode = "200", description = "User registered successfully")
     @ApiResponse(responseCode = "400", description = "Invalid input or username already exists")
     public ResponseEntity<String> register(@Valid @RequestBody UserRegisterRequest request) {
-        userService.registerUser(request.username(), request.password());
+        userService.registerUser(
+                request.username(),
+                request.password(),
+                request.recoveryKey()
+        );
         return ResponseEntity.ok("User registered successfully");
     }
 
@@ -45,4 +50,17 @@ public class AuthController {
         String token = userService.authenticateUser(loginRequest.username(), loginRequest.password());
         return ResponseEntity.ok(Collections.singletonMap("token", token));
     }
+
+    @PostMapping("/recovery")
+    @Operation(
+            summary = "Recover password using secret recovery key",
+            description = "Allows a user to reset their password by providing username and recovery key."
+    )
+    @ApiResponse(responseCode = "200", description = "Password updated successfully")
+    @ApiResponse(responseCode = "400", description = "Invalid username or recovery key")
+    public ResponseEntity<String> recoverPassword(@Valid @RequestBody PasswordRecoveryRequest request) {
+        userService.recoverPassword(request.username(), request.recoveryKey(), request.newPassword());
+        return ResponseEntity.ok("Password updated successfully");
+    }
+
 }

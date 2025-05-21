@@ -24,6 +24,9 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    @Column(nullable = false)
+    private String recoveryKey;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserRole role;
@@ -31,9 +34,10 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Environment> environments;
 
-    public User(String username, String password, UserRole role) {
+    public User(String username, String password, String recoveryKey, UserRole role) {
         this.username = username;
         this.password = password;
+        this.recoveryKey = recoveryKey;
         this.role = role;
     }
 }
