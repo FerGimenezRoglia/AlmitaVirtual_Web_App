@@ -25,7 +25,8 @@ public class AuthControllerTest extends BaseIntegrationTest {
                         .content("""
                                 {
                                   "username": "testuser",
-                                  "password": "Test1234!"
+                                  "password": "Test1234!",
+                                  "recoveryKey": "TestKey123!"
                                 }
                                 """))
                 .andExpect(status().isOk()); // Esperamos un HTTP 200
