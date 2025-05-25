@@ -1,4 +1,4 @@
-package s05.t02.security.config;
+package s05.t02.config;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;

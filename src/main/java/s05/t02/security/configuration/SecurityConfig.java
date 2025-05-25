@@ -1,4 +1,4 @@
-package s05.t02.security.config;
+package s05.t02.security.configuration;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
