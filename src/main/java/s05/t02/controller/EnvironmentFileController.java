@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotBlank;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import s05.t02.model.dto.EnvironmentDTO;
 import s05.t02.service.EnvironmentFileService;
 
@@ -29,9 +30,9 @@ public class EnvironmentFileController {
     @ApiResponse(responseCode = "401", description = "Unauthorized – JWT token is missing or invalid")
     @ApiResponse(responseCode = "403", description = "Forbidden – User not authorized to upload file")
     @ApiResponse(responseCode = "404", description = "Environment or user not found")
-    public ResponseEntity<EnvironmentDTO> uploadFile(@PathVariable Long id, @RequestParam("fileUrl") @NotBlank String fileUrl, Authentication authentication) {
+    public ResponseEntity<EnvironmentDTO> uploadFile(@PathVariable Long id, @RequestParam("file") MultipartFile file, Authentication authentication) {
         String username = authentication.getName();
-        EnvironmentDTO updated = environmentFileService.uploadFile(id, fileUrl, username);
+        EnvironmentDTO updated = environmentFileService.uploadFile(id, file, username);
         return ResponseEntity.ok(updated);
     }
 

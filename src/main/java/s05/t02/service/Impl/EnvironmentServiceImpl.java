@@ -1,8 +1,11 @@
 package s05.t02.service.Impl;
 
+import com.amazonaws.services.s3.AmazonS3;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import s05.t02.exception.custom.EnvironmentNotFoundException;
+import s05.t02.exception.custom.FileStorageException;
 import s05.t02.exception.custom.UnauthorizedEnvironmentAccessException;
 import s05.t02.exception.custom.UserNotFoundException;
 import s05.t02.model.Environment;
@@ -25,10 +28,16 @@ public class EnvironmentServiceImpl implements EnvironmentService {
 
     private final EnvironmentRepository environmentRepository;
     private final UserRepository userRepository;
+    private final AmazonS3 amazonS3;
 
-    public EnvironmentServiceImpl(EnvironmentRepository environmentRepository, UserRepository userRepository) {
+    @Value("${aws.s3.bucket}")
+    private String bucketName;
+
+    public EnvironmentServiceImpl(EnvironmentRepository environmentRepository, UserRepository userRepository, AmazonS3 amazonS3) {
         this.environmentRepository = environmentRepository;
         this.userRepository = userRepository;
+        this.amazonS3 = amazonS3;
+
     }
 
     @Override
@@ -194,6 +203,17 @@ public class EnvironmentServiceImpl implements EnvironmentService {
         if (!isOwner && !isAdmin) {
             log.warn("User '{}' is not authorized to delete environment with ID {}", username, id);
             throw new UnauthorizedEnvironmentAccessException("Unauthorized to delete this environment");
+        }
+
+        if (environment.getUrl() != null && !environment.getUrl().isBlank()) {
+            try {
+                String key = environment.getUrl().substring(environment.getUrl().lastIndexOf("/") + 1);
+                amazonS3.deleteObject(bucketName, key);
+                log.info("Deleted file '{}' from S3 before deleting environment", key);
+            } catch (Exception e) {
+                log.error("Failed to delete file from S3 before deleting environment", e);
+                throw new FileStorageException("Could not delete associated file from S3");
+            }
         }
 
         environmentRepository.delete(environment);

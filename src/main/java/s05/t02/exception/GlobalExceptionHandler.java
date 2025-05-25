@@ -48,10 +48,16 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(HttpStatus.FORBIDDEN, "Unauthorized Environment Access", ex.getMessage());
     }
 
+    @ExceptionHandler(FileValidationException.class)
+    public ResponseEntity<ErrorResponse> handleFileValidationException(FileValidationException ex) {
+        log.warn("File validation failed: {}", ex.getMessage());
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, "Invalid file input", ex.getMessage());
+    }
+
     @ExceptionHandler(FileStorageException.class)
     public ResponseEntity<ErrorResponse> handleFileStorageError(FileStorageException ex) {
         log.error("File handling error: {}", ex.getMessage());
-        return buildErrorResponse(HttpStatus.BAD_REQUEST, "File Error", ex.getMessage());
+        return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "File storage error", ex.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
