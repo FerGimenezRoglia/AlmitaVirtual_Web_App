@@ -1,5 +1,7 @@
 package s05.t02.service.Impl;
 
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,9 @@ import s05.t02.repository.EnvironmentRepository;
 import s05.t02.repository.UserRepository;
 import s05.t02.service.EnvironmentFileService;
 import com.amazonaws.services.s3.AmazonS3;
+
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 @Slf4j
 @Service
@@ -74,16 +79,22 @@ public class EnvironmentFileServiceImpl implements EnvironmentFileService {
         }
 
         try {
-            String bucketName = "almita-virtual-archivos"; // Debe coincidir con tu bucket creado en AWS S3
+            String bucketName = "almita-virtual-archivos";
             String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
 
-            amazonS3.putObject(bucketName, fileName, file.getInputStream(), null);
+            ObjectMetadata metadata = new ObjectMetadata();
+            metadata.setContentType(file.getContentType());
+            metadata.setContentLength(file.getSize());
+
+            PutObjectRequest request = new PutObjectRequest(bucketName, fileName, file.getInputStream(), metadata);
+            amazonS3.putObject(request);
+
             log.debug("File '{}' uploaded to bucket '{}'", fileName, bucketName);
 
             String previousUrl = environment.getUrl();
             if (previousUrl != null && !previousUrl.isBlank()) {
                 try {
-                    String key = previousUrl.substring(previousUrl.lastIndexOf("/") + 1);
+                    String key = URLDecoder.decode(previousUrl.substring(previousUrl.lastIndexOf("/") + 1), StandardCharsets.UTF_8);
                     amazonS3.deleteObject(bucketName, key);
                     log.info("Previous file '{}' successfully deleted from S3", key);
                 } catch (Exception e) {
