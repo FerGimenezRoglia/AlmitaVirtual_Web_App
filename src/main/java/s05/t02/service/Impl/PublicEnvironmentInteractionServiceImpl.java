@@ -1,6 +1,7 @@
 package s05.t02.service.Impl;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import s05.t02.exception.custom.EnvironmentNotFoundException;
 import s05.t02.model.Environment;
@@ -22,6 +23,7 @@ public class PublicEnvironmentInteractionServiceImpl implements PublicEnvironmen
     }
 
     @Override
+    @Cacheable(value = "publicEnvironmentById", key = "#environmentId")
     public PublicEnvironmentDTO getPublicEnvironmentById(Long environmentId) {
         log.info("Public request to fetch environment with ID {}", environmentId);
 
