@@ -134,7 +134,6 @@ Esto mejora el rendimiento general y reduce el consumo innecesario de recursos.
 ## Notas adicionales
 
 - El backend maneja validaciones, errores personalizados y filtros de autorización.
-- Los archivos se alojan en un servicio de almacenamiento en la nube Cloudinary (puede ser reemplazado por Amazon S3 u otro).
 - El backend es 100% stateless, usando JWT para mantener sesiones seguras.
 - El sistema permite recuperar contraseñas sin usar datos sensibles, mediante claves secretas generadas al registrarse. Es una solución ética y segura.
 
