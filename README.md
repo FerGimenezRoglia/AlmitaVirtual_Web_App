@@ -120,7 +120,7 @@ Una vez ejecutado el proyecto, accede a Swagger UI desde:
 ```
 http://localhost:8080/swagger-ui.html
 ```
-## Implemetación de Amazon S3 (Gestión de archivos)
+## Implementación de Amazon S3 (Gestión de archivos)
 
 La aplicación permite subir, visualizar y descargar archivos (PDF, JPG, PNG) directamente desde Amazon S3.  
 El backend gestiona toda la validación, la conexión con el bucket y la generación de URLs accesibles.  
@@ -128,7 +128,7 @@ Todo está integrado de forma segura con Spring Boot.
 
 ## Optimización de rendimiento (Sistema de Caché con Caffeine)
 
-Se implementó caché con Caffeine para evitar consultas repetidas a la base de datos en accesos públicos.  
+Se implementó caché con Caffeine para reducir las consultas repetidas a la base de datos en accesos públicos.  
 Esto mejora el rendimiento general y reduce el consumo innecesario de recursos.
 
 ## Notas adicionales
