@@ -18,6 +18,7 @@ Cada entorno está representado por una "Almita" (personaje animado) que cambia 
   - Un estado simbólico (IDLE, ACTIVE, REFLECTIVE, EXCITED, INSPIRED).
 - El backend gestiona:
   - Registro e inicio de sesión (JWT).
+  - Recuperación de contraseña "ética" (no se manejan datos sensibles).
   - Roles (`ROLE_USER`, `ROLE_ADMIN`).
   - CRUD completo de entornos.
   - Subida, descarga y eliminación de archivos.
@@ -37,8 +38,10 @@ Cada entorno está representado por una "Almita" (personaje animado) que cambia 
 - Spring Boot 3.2.4
 - Spring Security + JWT
 - Spring Data JPA + MySQL
+- Amazon S3 
 - Swagger (springdoc-openapi)
 - JUnit 5 + MockMvc
+- Caffeine
 - Maven
 
 ## Estructura de directorios
@@ -46,6 +49,7 @@ Cada entorno está representado por una "Almita" (personaje animado) que cambia 
 ```
 src/
 ├── main/java/s05/t02/
+│   ├── config/                  # Configuración de componentes de la aplicación
 │   ├── controller/              # Controladores REST
 │   ├── exception/               # Manejo de errores global
 │   ├── model/                   # Entidades y enums
@@ -55,6 +59,7 @@ src/
 │   ├── service/impl/            # Implementaciones de servicios
 │   └── AlmitaVirtualApplication.java
 ├── test/java/s05/t02/           # Tests de integración
+│   ├── config/                  
 │   └── controller/              # Tests por controlador
 ```
 
@@ -77,10 +82,11 @@ mvn test
 
 ### Autenticación
 
-| Método | Endpoint            | Descripción                    |
-|--------|---------------------|--------------------------------|
-| POST   | `/auth/register`    | Registro de nuevo usuario      |
-| POST   | `/auth/login`       | Inicio de sesión (devuelve JWT)|
+| Método | Endpoint            | Descripción                               |
+|--------|---------------------|-------------------------------------------|
+| POST   | `/auth/register`    | Registro de nuevo usuario                 |
+| POST   | `/auth/login`       | Inicio de sesión (devuelve JWT)           |
+| POST   | `/auth/recovery`    | Recuperación de contraseña (clave secreta)|
 
 ### Entornos (privado con JWT)
 
@@ -114,12 +120,22 @@ Una vez ejecutado el proyecto, accede a Swagger UI desde:
 ```
 http://localhost:8080/swagger-ui.html
 ```
+## Implementación de Amazon S3 (Gestión de archivos)
+
+La aplicación permite subir, visualizar y descargar archivos (PDF, JPG, PNG) directamente desde Amazon S3.  
+El backend gestiona toda la validación, la conexión con el bucket y la generación de URLs accesibles.  
+Todo está integrado de forma segura con Spring Boot.
+
+## Optimización de rendimiento (Sistema de Caché con Caffeine)
+
+Se implementó caché con Caffeine para reducir las consultas repetidas a la base de datos en accesos públicos.  
+Esto mejora el rendimiento general y reduce el consumo innecesario de recursos.
 
 ## Notas adicionales
 
 - El backend maneja validaciones, errores personalizados y filtros de autorización.
-- Los archivos se alojan en un servicio de almacenamiento en la nube Cloudinary (puede ser reemplazado por Amazon S3 u otro).
 - El backend es 100% stateless, usando JWT para mantener sesiones seguras.
+- El sistema permite recuperar contraseñas sin usar datos sensibles, mediante claves secretas generadas al registrarse. Es una solución ética y segura.
 
 ---
 
