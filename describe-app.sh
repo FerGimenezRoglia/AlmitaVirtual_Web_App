@@ -88,6 +88,7 @@ echo "- Swagger (springdoc-openapi)"
 echo "- JUnit 5 + MockMvc"
 echo "- Caffeine (sistema de caché)"
 echo "- Maven"
+
 echo ""
 
 echo "${MAGENTA}${BOLD}FLUJO DEL PROGRAMA${NC}"
