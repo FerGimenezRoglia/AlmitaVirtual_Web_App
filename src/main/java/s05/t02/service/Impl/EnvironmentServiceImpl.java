@@ -42,11 +42,11 @@ public class EnvironmentServiceImpl implements EnvironmentService {
 
     @Override
     public EnvironmentDTO createEnvironment(EnvironmentCreateRequest request, String username) {
-        log.info("Creating environment for user '{}'", username);
+        log.info("Creating environment for user");
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> {
-                    log.warn("User '{}' not found while creating environment", username);
+                    log.warn("User not found while creating environment");
                     return new UserNotFoundException("User not found");
                 });
 
@@ -66,7 +66,7 @@ public class EnvironmentServiceImpl implements EnvironmentService {
                 .build();
 
         Environment saved = environmentRepository.save(environment);
-        log.info("Environment '{}' created successfully with ID {} for user '{}'", saved.getTitle(), saved.getId(), username);
+        log.info("Environment created successfully with ID {}", saved.getId());
 
         return new EnvironmentDTO(
                 saved.getId(),
@@ -95,27 +95,27 @@ public class EnvironmentServiceImpl implements EnvironmentService {
 
     @Override
     public List<Environment> getUserEnvironments(String username) {
-        log.info("Fetching environments for user '{}'", username);
+        log.info("Fetching environments for current user");
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> {
-                    log.warn("User '{}' not found while fetching environments", username);
+                    log.warn("User not found while fetching environments");
                     return new UserNotFoundException("User not found");
                 });
 
         List<Environment> environments = environmentRepository.findByUserId(user.getId());
 
         if (environments.isEmpty()) {
-            log.info("No environments found for user '{}'", username);
+            log.info("No environments found for current user");
         } else {
-            log.info("Found {} environments for user '{}'", environments.size(), username);
+            log.info("Found {} environments for current user", environments.size());
         }
         return environments;
     }
 
     @Override
     public Environment getEnvironmentById(Long id, String username) {
-        log.info("Fetching environment with ID {} for user '{}'", id, username);
+        log.info("Fetching environment with ID {} by current user", id);
 
         Environment environment = environmentRepository.findById(id)
                 .orElseThrow(() -> {
@@ -125,26 +125,26 @@ public class EnvironmentServiceImpl implements EnvironmentService {
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> {
-                    log.warn("User '{}' not found while accessing environment ID {}", username, id);
+                    log.warn("User not found while accessing environment ID {} by current user", id);
                     return new UserNotFoundException("User not found");
                 });
 
         if (!environment.getUser().getId().equals(user.getId()) && user.getRole() != UserRole.ROLE_ADMIN) {
-            log.warn("Unauthorized access attempt by user '{}' to environment ID {}", username, id);
+            log.warn("Unauthorized access attempt to environment ID {} by current user", id);
             throw new UnauthorizedEnvironmentAccessException("Access denied to this environment");
         }
 
-        log.info("Environment with ID {} retrieved successfully for user '{}'", id, username);
+        log.info("Environment with ID {} retrieved successfully for current user", id);
         return environment;
     }
 
     @Override
     public Environment updateEnvironment(Long id, EnvironmentUpdateRequest request, String username) {
-        log.info("Updating environment with ID {} for user '{}'", id, username);
+        log.info("Updating environment with ID {} for current user", id);
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> {
-                    log.warn("User '{}' not found while updating environment", username);
+                    log.warn("User not found while updating environment");
                     return new UserNotFoundException("User not found");
                 });
 
@@ -157,7 +157,7 @@ public class EnvironmentServiceImpl implements EnvironmentService {
         boolean isOwner = environment.getUser().getId().equals(user.getId());
         boolean isAdmin = user.getRole().equals(UserRole.ROLE_ADMIN);
         if (!isOwner && !isAdmin) {
-            log.warn("User '{}' is not authorized to update environment with ID {}", username, id);
+            log.warn("Unauthorized attempt to update environment with ID {}", id);
             throw new UnauthorizedEnvironmentAccessException("Unauthorized to update this environment");
         }
 
@@ -184,11 +184,11 @@ public class EnvironmentServiceImpl implements EnvironmentService {
 
     @Override
     public void deleteEnvironment(Long id, String username) {
-        log.info("Attempting to delete environment with ID {} for user '{}'", id, username);
+        log.info("Attempting to delete environment with ID {} for current user", id);
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> {
-                    log.warn("User '{}' not found while deleting environment", username);
+                    log.warn("User not found while deleting environment");
                     return new UserNotFoundException("User not found");
                 });
 
@@ -201,7 +201,7 @@ public class EnvironmentServiceImpl implements EnvironmentService {
         boolean isOwner = environment.getUser().getId().equals(user.getId());
         boolean isAdmin = user.getRole().equals(UserRole.ROLE_ADMIN);
         if (!isOwner && !isAdmin) {
-            log.warn("User '{}' is not authorized to delete environment with ID {}", username, id);
+            log.warn("Unauthorized attempt to delete environment with ID {}", id);
             throw new UnauthorizedEnvironmentAccessException("Unauthorized to delete this environment");
         }
 
@@ -209,7 +209,7 @@ public class EnvironmentServiceImpl implements EnvironmentService {
             try {
                 String key = environment.getUrl().substring(environment.getUrl().lastIndexOf("/") + 1);
                 amazonS3.deleteObject(bucketName, key);
-                log.info("Deleted file '{}' from S3 before deleting environment", key);
+                log.info("Deleted file from S3 before deleting environment");
             } catch (Exception e) {
                 log.error("Failed to delete file from S3 before deleting environment", e);
                 throw new FileStorageException("Could not delete associated file from S3");
@@ -217,7 +217,7 @@ public class EnvironmentServiceImpl implements EnvironmentService {
         }
 
         environmentRepository.delete(environment);
-        log.info("Environment with ID {} deleted successfully by user '{}'", id, username);
+        log.info("Environment with ID {} deleted successfully", id);
     }
 
 }

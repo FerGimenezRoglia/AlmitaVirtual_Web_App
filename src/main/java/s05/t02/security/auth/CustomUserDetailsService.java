@@ -20,18 +20,18 @@ public class CustomUserDetailsService implements UserDetailsService {
     /**
      * Carga al usuario desde la base de datos por username.
      * Este método lo usa internamente Spring Security al hacer login.
+     * Adaptamos nuestra entidad User a un UserDetails de Spring.
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        log.info("Searching user by username: {}", username);
+        log.info("Loading user details for authentication");
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> {
-                    log.warn("User not found: {}", username);
+                    log.warn("User not found while loading user details");
                     return new UsernameNotFoundException("User not found: " + username);
                 });
 
-        // Adaptamos nuestra entidad User a un UserDetails de Spring
         return org.springframework.security.core.userdetails.User
                 .withUsername(user.getUsername())
                 .password(user.getPassword())

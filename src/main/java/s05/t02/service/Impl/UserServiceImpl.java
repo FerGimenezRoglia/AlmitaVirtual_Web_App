@@ -32,10 +32,10 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public UserDTO registerUser(String username, String password, String recoveryKey) {
-        log.info("Registering user: {}", username);
+        log.info("Attempting to register new user");
 
         if (userRepository.existsByUsername(username)) {
-            log.warn("Username '{}' already exists", username);
+            log.warn("Registration failed: username already exists");
             throw new UsernameAlreadyExistsException("Username already exists");
         }
 
@@ -45,7 +45,7 @@ public class UserServiceImpl implements UserService {
         User user = new User(username, hashedPassword, hashedRecoveryKey, UserRole.ROLE_USER);
         user = userRepository.save(user);
 
-        log.info("User '{}' registered successfully", username);
+        log.info("User registered successfully");
         return new UserDTO(user.getId(), user.getUsername(), user.getRole());
     }
 
@@ -57,16 +57,16 @@ public class UserServiceImpl implements UserService {
     public String authenticateUser(String username, String password) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> {
-                    log.warn("User '{}' not found", username);
+                    log.warn("Authentication failed: invalid credentials");
                     return new InvalidCredentialsException("Invalid username or password");
                 });
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            log.warn("Password mismatch for user '{}'", username);
+            log.warn("Authentication failed: invalid credentials");
             throw new InvalidCredentialsException("Invalid username or password");
         }
 
-        log.info("User '{}' authenticated successfully", username);
+        log.info("User authenticated successfully");
         return jwtUtil.generateToken(user.getUsername(), user.getRole().name());
     }
 
@@ -78,12 +78,12 @@ public class UserServiceImpl implements UserService {
     public void recoverPassword(String username, String recoveryKey, String newPassword) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> {
-                    log.warn("User '{}' not found during recovery attempt", username);
+                    log.warn("Password recovery failed: invalid credentials");
                     return new InvalidCredentialsException("Invalid username or recovery key");
                 });
 
         if (!passwordEncoder.matches(recoveryKey, user.getRecoveryKey())) {
-            log.warn("Recovery key mismatch for user '{}'", username);
+            log.warn("Password recovery failed: invalid credentials");
             throw new InvalidCredentialsException("Invalid username or recovery key");
         }
 
@@ -91,7 +91,7 @@ public class UserServiceImpl implements UserService {
         user.setPassword(hashedNewPassword);
         userRepository.save(user);
 
-        log.info("Password updated successfully for user '{}'", username);
+        log.info("Password updated successfully");
     }
 
 }
