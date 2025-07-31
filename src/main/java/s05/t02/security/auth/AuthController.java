@@ -10,7 +10,6 @@ import s05.t02.model.dto.PasswordRecoveryRequest;
 import s05.t02.model.dto.UserLoginRequest;
 import s05.t02.model.dto.UserRegisterRequest;
 import s05.t02.service.UserService;
-
 import java.util.Collections;
 
 @RestController

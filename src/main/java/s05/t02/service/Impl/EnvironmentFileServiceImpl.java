@@ -40,11 +40,11 @@ public class EnvironmentFileServiceImpl implements EnvironmentFileService {
 
     @Override
     public EnvironmentDTO uploadFile(Long environmentId, MultipartFile file, String username) {
-        log.info("User '{}' is uploading file to environment ID {}", username, environmentId);
+        log.info("Uploading file to environment ID {} by current user", environmentId);
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> {
-                    log.warn("User '{}' not found", username);
+                    log.warn("User not found while uploading file");
                     return new UserNotFoundException("User not found");
                 });
 
@@ -57,7 +57,7 @@ public class EnvironmentFileServiceImpl implements EnvironmentFileService {
         boolean isOwner = environment.getUser().getId().equals(user.getId());
         boolean isAdmin = user.getRole() == UserRole.ROLE_ADMIN;
         if (!isOwner && !isAdmin) {
-            log.warn("User '{}' is not authorized to upload file to environment ID {}", username, environmentId);
+            log.warn("Unauthorized attempt to upload file to environment ID {} by current user", environmentId);
             throw new UnauthorizedEnvironmentAccessException("Unauthorized to upload file");
         }
 
@@ -89,16 +89,16 @@ public class EnvironmentFileServiceImpl implements EnvironmentFileService {
             PutObjectRequest request = new PutObjectRequest(bucketName, fileName, file.getInputStream(), metadata);
             amazonS3.putObject(request);
 
-            log.debug("File '{}' uploaded to bucket '{}'", fileName, bucketName);
+            log.debug("File uploaded to S3 successfully");
 
             String previousUrl = environment.getUrl();
             if (previousUrl != null && !previousUrl.isBlank()) {
                 try {
                     String key = URLDecoder.decode(previousUrl.substring(previousUrl.lastIndexOf("/") + 1), StandardCharsets.UTF_8);
                     amazonS3.deleteObject(bucketName, key);
-                    log.info("Previous file '{}' successfully deleted from S3", key);
+                    log.info("Previous file successfully deleted from S3");
                 } catch (Exception e) {
-                    log.error("Error deleting previous file from S3: {}", e.getMessage(), e);
+                    log.error("Error deleting previous file from S3", e);
                     throw new FileStorageException("Failed to delete previous file from S3");
                 }
             }
@@ -129,7 +129,7 @@ public class EnvironmentFileServiceImpl implements EnvironmentFileService {
 
     @Override
     public EnvironmentDTO deleteFile(Long environmentId, String username) {
-        log.info("User '{}' is attempting to delete file from environment ID {}", username, environmentId);
+        log.info("Attempting to delete file from environment ID {} by current user", environmentId);
 
         Environment environment = environmentRepository.findById(environmentId)
                 .orElseThrow(() -> {
@@ -139,14 +139,14 @@ public class EnvironmentFileServiceImpl implements EnvironmentFileService {
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> {
-                    log.warn("User '{}' not found while deleting file", username);
+                    log.warn("User not found while deleting file");
                     return new UserNotFoundException("User not found");
                 });
 
         boolean isOwner = environment.getUser().getId().equals(user.getId());
         boolean isAdmin = user.getRole().equals(UserRole.ROLE_ADMIN);
         if (!isOwner && !isAdmin) {
-            log.warn("User '{}' is not authorized to delete file from environment ID {}", username, environmentId);
+            log.warn("Unauthorized attempt to delete file from environment ID {}", environmentId);
             throw new UnauthorizedEnvironmentAccessException("Unauthorized to delete file from this environment");
         }
 
@@ -160,9 +160,9 @@ public class EnvironmentFileServiceImpl implements EnvironmentFileService {
             try {
                 String key = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
                 amazonS3.deleteObject(bucketName, key);
-                log.info("File '{}' successfully deleted from S3", key);
+                log.info("File successfully deleted from S3 before removing reference in environment");
             } catch (Exception e) {
-                log.error("Error deleting file from S3: {}", e.getMessage(), e);
+                log.error("Error deleting file from S3", e);
                 throw new FileStorageException("Failed to delete file from S3");
             }
         }
@@ -171,7 +171,7 @@ public class EnvironmentFileServiceImpl implements EnvironmentFileService {
         EnvironmentStatusResolver.updateStatus(environment, InteractionType.FILE_DELETE);
 
         Environment updated = environmentRepository.save(environment);
-        log.info("File deleted successfully from environment ID {} by user '{}'", environmentId, username);
+        log.info("File deleted successfully from environment ID {} by current user", environmentId);
 
         return new EnvironmentDTO(
                 updated.getId(),

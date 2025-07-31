@@ -21,24 +21,21 @@ public class JwtUtil {
 
     private final SecretKey secretKey;
     private final long accessTokenExpiration;
-    private final UserRepository userRepository;
 
     /**
      * Constructor que inicializa la clave secreta a partir del valor del archivo application.properties
      */
     public JwtUtil(@Value("${jwt.secret}") String secret,
-                   @Value("${jwt.expiration}") long expiration,
-                   UserRepository userRepository) {
+                   @Value("${jwt.expiration}") long expiration) {
         this.secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
         this.accessTokenExpiration = expiration;
-        this.userRepository = userRepository;
     }
 
     /**
      * Genera un token JWT con el nombre de usuario y el rol como claims.
      */
     public String generateToken(String username, String role) {
-        log.info("Generating token for user '{}', with role '{}'", username, role);
+        log.info("JWT token generated");
 
         return Jwts.builder()
                 .setSubject(username)
